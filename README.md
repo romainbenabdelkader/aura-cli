@@ -1,60 +1,94 @@
-# AURA CLI – Minimal Origin Proof Demo
+# AURA CLI (reference demo)
 
-This repository contains a minimal command-line tool to issue and verify AURA origin manifests for local assets.
+This repository contains a minimal command-line tool demonstrating the core concepts
+of the **AURA (European Origin Proof) draft standard**.
 
-It is a **prototype** implementation of the AURA Origin Proof Standard (Draft v0.1):
+It allows issuing and verifying a signed AURA manifest for a local digital asset
+(audio, image, text, video), using cryptographic hashes and signatures.
 
-- AURA-ID style identifier (local/demo format)
-- JSON-LD manifest structure
-- SHA3-256 hash of the raw asset
-- Ed25519 signatures over canonical JSON
-- TDM opt-out flag (`rights.tdm_opt_out`)
+> **Reference demo (non-production).**  
+> This CLI is intended to illustrate the AURA draft with a minimal, local workflow.  
+> It is **not** a production implementation and is **not** a trust registry (TPKR).  
+> It does **not** perform DRM, fingerprinting, watermarking, or content recognition.
 
-The goal of this CLI is to **demonstrate** how AURA manifests can be created and verified locally, not to provide a production-ready implementation.
+---
+
+## What this demo illustrates
+
+- Cryptographic hashing of an asset (SHA3‑256)
+- Creation of a signed **AURA manifest** (JSON)
+- Verification of asset integrity and manifest signature
+- Expression of a simple rights signal (TDM opt‑out)
+- Offline, portable proof of origin (no platform dependency)
+
+---
+
+## What this demo does NOT do
+
+- No DRM
+- No fingerprinting
+- No watermarking
+- No content recognition
+- No platform, database, or registry
+- No rights allocation or remuneration logic
+
+---
+
+## Identifiers
+
+- AURA identifier (demo format; **not globally unique** in this prototype)
+- Asset hash: `sha3‑256:<hex>`
+- Issuer identifier: local/demo issuer (`LOCAL-ISSUER`)
+
+---
+
+## Third‑party verification (important)
+
+This demo stores issuer keys locally.
+
+In this prototype, verification uses the local issuer public key.
+For **independent third‑party verification**, the issuer public key must be distributed
+(e.g. embedded in the manifest or provided via a public key registry).
+
+Key distribution and trust registries are **out of scope** of this minimal demo.
+
+---
 
 ## Usage
 
-Install dependencies (Python 3.11+ recommended):
-
+### Initialise a local issuer
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python3 -m pip install cryptography
+python aura.py init
 
-Initialize local issuer (keys + metadata):
+Issue an AURA manifest
 
-python3 aura_cli.py init
+python aura.py issue --asset example.wav --asset-type audio --tdm-opt-out
 
-Issue a manifest for an asset:
+This generates a .aura manifest file next to the asset.
 
-python3 aura_cli.py issue \
-  --asset myfile.wav \
-  --asset-type audio \
-  --tdm-opt-out
-# → writes myfile.wav.aura
+Verify an AURA manifest
 
-Verify a manifest:
+python aura.py verify --asset example.wav --manifest example.wav.aura
 
-python3 aura_cli.py verify \
-  --asset myfile.wav \
-  --manifest myfile.wav.aura
 
-If the hash and signature are valid, the CLI prints a short summary of the manifest.
+⸻
 
 Security / Limitations
-
 	•	Keys are generated and stored locally without passphrase (demo only).
-	•	aura_id uses a local, non-global format (AURA-LOCAL-…-TEST).
-	•	No TPKR / trust registry integration yet.
+	•	aura_id uses a local, non‑global format in this prototype (AURA-LOCAL-…-TEST).
+	•	No trust registry (TPKR) or key rotation mechanism.
 	•	Not intended for production use.
 
-## Privacy / GDPR
+⸻
 
-This CLI does not process personal data.
-It operates solely on local assets and cryptographic material (hashes, signatures, public keys).
+GDPR / personal data
 
-Any use involving personal data (e.g., embedding identifiers linked to a natural person) is the sole responsibility of the implementer.
+This CLI is designed to operate without personal data.
+It processes local assets and cryptographic material only
+(hashes, signatures, and keys).
 
-For the full AURA standard draft, see:
-	•	https://github.com/romainbenabdelkader/AURA-STANDARD
-	•	https://www.aura-standard.org
+⸻
+
+Related resources
+	•	AURA standard (Public Draft): https://github.com/romainbenabdelkader/AURA-STANDARD
+	•	Project overview: https://www.aura-standard.org
