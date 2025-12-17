@@ -42,6 +42,7 @@ python3 aura_cli.py verify \
 If the hash and signature are valid, the CLI prints a short summary of the manifest.
 
 Security / Limitations
+
 	•	Keys are generated and stored locally without passphrase (demo only).
 	•	aura_id uses a local, non-global format (AURA-LOCAL-…-TEST).
 	•	No TPKR / trust registry integration yet.
