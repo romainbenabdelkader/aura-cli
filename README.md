@@ -50,3 +50,10 @@ Security / Limitations
 For the full AURA standard draft, see:
 	•	https://github.com/romainbenabdelkader/AURA-STANDARD
 	•	https://www.aura-standard.org
+
+
+Privacy & GDPR
+
+This reference implementation does not process personal data.
+It operates solely on digital assets and cryptographic material.
+Any use involving personal data is the sole responsibility of the implementer.
