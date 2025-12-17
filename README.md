@@ -48,13 +48,13 @@ Security / Limitations
 	•	No TPKR / trust registry integration yet.
 	•	Not intended for production use.
 
+## Privacy / GDPR
+
+This CLI does not process personal data.
+It operates solely on local assets and cryptographic material (hashes, signatures, public keys).
+
+Any use involving personal data (e.g., embedding identifiers linked to a natural person) is the sole responsibility of the implementer.
+
 For the full AURA standard draft, see:
 	•	https://github.com/romainbenabdelkader/AURA-STANDARD
 	•	https://www.aura-standard.org
-
-
-Privacy & GDPR
-
-This reference implementation does not process personal data.
-It operates solely on digital assets and cryptographic material.
-Any use involving personal data is the sole responsibility of the implementer.
