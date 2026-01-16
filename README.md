@@ -1,4 +1,16 @@
-# AURA CLI (reference demo)
+# > 🎬 Short demo video (tamper detection & origin proof):
+> https://youtu.be/hyGM4gvHMXI
+
+This demo specifically illustrates that:
+
+- an asset can be bound to a cryptographic proof of origin,
+
+- the proof is verifiable offline and independently,
+
+- and any modification of the asset (even minimal) immediately breaks the proof.
+
+
+AURA CLI (reference demo)
 
 Not related to Neo4j “Aura CLI”.
 
