@@ -36,6 +36,18 @@ It does not perform DRM, watermarking, fingerprinting, similarity detection, or 
   
 - Offline, portable proof of origin (no platform dependency)
 
+## Demo scenario (as shown in the video)
+
+1. Verify an original asset against its AURA manifest → VALID
+
+2. Make a copy of the asset → still VALID
+
+3. Alter the copied file (even by 1 byte)
+
+4. Verify again → FAIL (asset hash mismatch)
+
+This demonstrates that the AURA proof is strictly bound to the binary content of the asset.
+
 ## Requirements
 
 ```bash
