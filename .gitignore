@@ -1,6 +1,12 @@
-# do not commit private material
+# local demo issuer keys (do not commit)
 issuer_private.pem
+issuer_public.pem
+issuer.json
 *.pem
 
-# mac
+# mac / python
 .DS_Store
+__pycache__/
+*.pyc
+.venv/
+venv/
