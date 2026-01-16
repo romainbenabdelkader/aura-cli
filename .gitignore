@@ -1,0 +1,6 @@
+# do not commit private material
+issuer_private.pem
+*.pem
+
+# mac
+.DS_Store
