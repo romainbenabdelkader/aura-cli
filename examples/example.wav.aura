@@ -1,0 +1,22 @@
+{
+  "@context": "https://aura-standard.org/context/v1.jsonld",
+  "origin_proof_version": "0.1",
+  "aura_id": "AURA-LOCAL-2026-000001-TEST",
+  "origin": {
+    "type": "human",
+    "declared_by": "issuer"
+  },
+  "asset": {
+    "type": "audio",
+    "hash": "sha3-256:d91b81a6cf3f35bfbc5eea4dff4700f0228ac0ded3df4e0d86129de243a36788"
+  },
+  "issuer_id": "LOCAL-ISSUER",
+  "issued_at": "2026-01-16T23:17:57.364687Z",
+  "rights": {
+    "tdm_opt_out": true
+  },
+  "signature": {
+    "alg": "ed25519",
+    "value": "jisA0rxYdn/Fx138aEOerazaUT5Jk4LvmLXGLNFzWVy7n6+Uhs7u263tZw6ySaQ+jKfbXf9LOeSD8+VsTDMrAQ=="
+  }
+}
