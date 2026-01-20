@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18306686.svg)](https://doi.org/10.5281/zenodo.18306686)
+
 # AURA CLI (reference demo)
 
 > 🎬 Short demo video (tamper detection & origin proof):  
