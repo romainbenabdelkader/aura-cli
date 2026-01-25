@@ -10,3 +10,8 @@ __pycache__/
 *.pyc
 .venv/
 venv/
+# generated AURA manifests (do not commit)
+*.aura
+*.aura.json
+*.aura.jsonld
+tpk_registry.json
