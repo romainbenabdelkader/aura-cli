@@ -1,151 +1,162 @@
-AURA CLI — Reference Demo (Testbed)
+# AURA CLI — Minimal Reference Demonstrator
 
-AURA CLI is a minimal command-line reference implementation demonstrating the core concepts of the AURA (European Origin Proof) public draft.
+AURA CLI is a minimal command-line demonstrator showing how a digital asset can be bound to a verifiable proof-of-origin and consent signal.
 
-It provides a simple, auditable example of how a digital asset can be bound to a verifiable proof of origin using cryptographic primitives, without DRM, watermarking, monitoring, or platform control.
+It is a reference testbed for the AURA model.
 
-⸻
+> AURA establishes facts. It does not enforce rights.
 
-Demo video (reference only)
+AURA CLI provides a simple, auditable example of how a digital asset can be linked to a cryptographically verifiable manifest, without DRM, watermarking, monitoring, or platform control.
 
-🎥 Short demo video (tamper detection & origin proof)
+---
+
+## Demo video (reference only)
+
+Short demo video (tamper detection and origin proof):  
 https://youtu.be/hyGM4gvHMXI
 
-⚠️ Note
-This video illustrates the conceptual workflow and an earlier version of the CLI.
-The current codebase refines the trust model (TPKR registry, key handling, metadata) while preserving the same logical principles demonstrated in the video.
+Note: this video illustrates the conceptual workflow and an earlier version of the CLI.  
+The current codebase refines the trust model (TPKR registry, key handling, metadata) while preserving the same core principles.
 
+---
+
+## Position in the AURA ecosystem
+
+AURA is structured as three distinct layers:
+
+- **AURA-STANDARD** — conceptual and specification layer  
+  https://github.com/romainbenabdelkader/AURA-STANDARD
+
+- **aura-core** — reusable implementation primitives  
+  https://github.com/romainbenabdelkader/aura-core
+
+- **aura-cli** — minimal command-line demonstrator  
+  (this repository)
+
+This repository is non-normative.
+
+---
+
+## Why this demonstrator exists
+
+Current debates on AI, copyright, provenance and digital regulation often rely on:
+- declarations
+- internal logs
+- probabilistic indicators
+- platform-controlled evidence
+
+AURA CLI illustrates a different approach:
+
+> establishing certain origin-related statements in a cryptographically verifiable way at the source level.
+
+---
+
+## Quick start
+
+### 1. Clone the repository
+
+```bash
 git clone https://github.com/romainbenabdelkader/aura-cli
 cd aura-cli
+
+2. Install dependencies
 pip install -r requirements.txt
-
-1) Initialize a demo issuer + local TPKR registry
-
+3. Initialize a demo issuer and local TPKR registry
 python aura_cli.py init \
   --org "Demo Org" \
   --country FR \
   --contact "demo@example.org"
+  This generates:
+	•	an Ed25519 key pair (private key optionally encrypted via AURA_KEY_PASSWORD)
+	•	issuer metadata
+	•	a local TPKR demo registry
 
-This generates:
-
-• an Ed25519 key pair (private key optionally encrypted via AURA_KEY_PASSWORD),
-	
-•	issuer metadata,
-	
-•	a local TPKR demo registry.
-
-⸻
-
-2) Issue an AURA manifest for a local asset
-
+4. Issue an AURA manifest for a local asset
 python aura_cli.py issue \
   --asset examples/example.wav \
   --asset-type audio \
   --tdm-opt-out
+  This produces a signed .aura.json manifest bound to the asset hash.
 
-This produces a signed .aura.json manifest bound to the asset hash.
-
-⸻
-
-3) Verify the asset against its manifest
-
+5. Verify the asset against its manifest
 python aura_cli.py verify \
   --asset examples/example.wav \
   --manifest examples/example.wav.aura.json
-Expected behaviour
-
-•	✅ original file → VALID
-	
-•	✅ identical copy → VALID
-	
-•	❌ modified file → INVALID
+  Expected behaviour:
+	•	original file → VALID
+	•	identical copy → VALID
+	•	modified file → INVALID
 
 ⸻
 
-What this demo shows
+What this demonstrator shows
 
 This repository demonstrates, in the simplest possible form:
-	
-•	cryptographic binding between an asset and a manifest,
-	
-•	deterministic canonicalisation of the manifest (demo profile),
-	
-•	Ed25519 signatures,
-	
-•	issuer resolution via a registry (TPKR demo),
-	
-•	explicit separation between:
-	
-•	proof of origin,
-	
-•	enforcement,
-	
-•	monitoring.
+	•	cryptographic binding between an asset and a manifest
+	•	deterministic canonicalisation of the manifest (demo profile)
+	•	Ed25519 signatures
+	•	issuer resolution via a registry (TPKR demo)
+	•	explicit separation between:
+	•	proof of origin
+	•	enforcement
+	•	monitoring
 
 ⸻
 
-What this demo does not do
+What this demonstrator does not do
 
-This is a reference demonstration only.
+This is a reference demonstrator only.
 
 It does not implement:
-	
-•	DRM
-	
-•	watermarking
-	
-•	fingerprinting
-	
-•	similarity detection
-	
-•	content recognition
-	
-•	usage monitoring
-	
-•	platform-side enforcement
+	•	DRM
+	•	watermarking
+	•	fingerprinting
+	•	similarity detection
+	•	content recognition
+	•	usage monitoring
+	•	platform-side enforcement
 
 No rights are enforced.
-
 No platforms are controlled.
-
 No content is analysed beyond hashing.
 
 ⸻
 
-Files generated by the demo
-	
-•	issuer_private.pem
-Private key (optionally encrypted using AURA_KEY_PASSWORD)
-	
-•	issuer_public.pem
-Public key
-	
-•	issuer.json
-Issuer metadata
-	
-•	tpk_registry.json
-Local TPKR demo registry (non-governed)
-	
-•	*.aura.json
-AURA manifests bound to assets
+Example use case
+
+AI training opt-out
+
+A publisher or issuer may attach a declaration to an asset indicating:
+	•	origin
+	•	issuer
+	•	time of declaration
+	•	an opt-out-related signal
+
+AURA CLI demonstrates how this declaration can be made verifiable.
+
+It does not demonstrate whether downstream systems respected the declaration.
 
 ⸻
 
-Security & trust model (demo only)
-	
-•	The trust registry is local and not governed.
-	
-•	Registry state can be modified locally (testbed assumption).
-	
-•	In a real deployment:
-	
-•	the registry would be governed,
-	
-•	its state (or hash) would be published or anchored,
-	
-•	issuer onboarding would follow defined governance rules.
+Files generated by the demonstrator
+	•	issuer_private.pem — private key (optionally encrypted using AURA_KEY_PASSWORD)
+	•	issuer_public.pem — public key
+	•	issuer.json — issuer metadata
+	•	tpk_registry.json — local TPKR demo registry (non-governed)
+	•	*.aura.json — AURA manifests bound to assets
 
-This demo intentionally keeps the trust model explicit and inspectable.
+⸻
+
+Security and trust model (demo only)
+	•	The trust registry is local and not governed.
+	•	Registry state can be modified locally (testbed assumption).
+
+In a real deployment:
+	•	the registry would be governed
+	•	its state (or hash) would be published or anchored
+	•	issuer onboarding would follow defined governance rules
+
+This demonstrator intentionally keeps the trust model explicit and inspectable.
 
 ⸻
 
@@ -154,16 +165,11 @@ GDPR / personal data
 This CLI is designed to operate without personal data.
 
 It processes only:
-	
-•	local files,
-	
-•	cryptographic hashes,
-	
-•	signatures,
-	
-•	keys,
-	
-•	optional non-identifying issuer metadata.
+	•	local files
+	•	cryptographic hashes
+	•	signatures
+	•	keys
+	•	optional non-identifying issuer metadata
 
 No personal data is required.
 
@@ -172,18 +178,36 @@ No personal data is required.
 Scope and intent
 
 AURA CLI is:
-	
-•	a technical reference,
-	
-•	a testbed artifact,
-	
-•	a discussion support tool for regulators, institutions and engineers.
+	•	a technical reference
+	•	a testbed artefact
+	•	a discussion support tool for regulators, institutions and engineers
 
 It is not production software.
 
 ⸻
 
 Related resources
-	
-•	AURA Standard — Public Draft
+
+AURA standard — public draft
+
 https://github.com/romainbenabdelkader/AURA-STANDARD
+
+AURA v0.1 — Public Draft DOI
+
+https://doi.org/10.5281/zenodo.19123074
+
+Research paper
+
+AURA: A Minimal Evidentiary Layer for Origin and Consent Signals in the AI Era
+https://doi.org/10.2139/ssrn.6135847
+
+⸻
+
+Status
+
+Reference demonstrator only.
+Non-normative.
+Not production software.
+License
+
+MIT
