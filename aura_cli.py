@@ -14,6 +14,7 @@ Status:
 
 import argparse
 import base64
+import copy
 import hashlib
 import json
 import os
@@ -23,6 +24,7 @@ from getpass import getpass
 from pathlib import Path
 from typing import Dict, Any
 
+from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PrivateKey,
@@ -33,6 +35,16 @@ ISSUER_PRIVATE_KEY_FILE = "issuer_private.pem"
 ISSUER_PUBLIC_KEY_FILE = "issuer_public.pem"
 ISSUER_META_FILE = "issuer.json"
 TPKR_REGISTRY_FILE = "tpk_registry.json"
+
+LOCAL_AURA_VERSION = "0.1"
+LOCAL_AURA_ID = "AURA-LOCAL-2026-000001-TEST"
+LOCAL_ISSUER_ID = "LOCAL-ISSUER"
+LOCAL_ISSUER_NAME = "Romain Benabdelkader"
+LOCAL_LEGAL_NOTE = (
+    "This manifest provides a verifiable technical proof of declaration, "
+    "integrity and timestamp. It does not replace legal qualification by a "
+    "court, regulator or competent authority."
+)
 
 
 # ---------------------------------------------------------------------------
@@ -72,6 +84,16 @@ def sha256_file_hex(path: Path) -> str:
         for chunk in iter(lambda: f.read(8192), b""):
             h.update(chunk)
     return h.hexdigest()
+
+
+def unsigned_local_manifest(manifest: Dict[str, Any]) -> Dict[str, Any]:
+    unsigned = copy.deepcopy(manifest)
+    unsigned.pop("signature", None)
+    return unsigned
+
+
+def local_manifest_hash_hex(manifest: Dict[str, Any]) -> str:
+    return sha256_bytes_hex(canonical_json_demo_v0(unsigned_local_manifest(manifest)))
 
 
 def safe_chmod_600(path: Path) -> None:
@@ -339,6 +361,145 @@ def cmd_issue(args):
     }, indent=2, ensure_ascii=False))
 
 
+def build_local_manifest(asset: Path) -> Dict[str, Any]:
+    private_key = Ed25519PrivateKey.generate()
+    public_key = private_key.public_key()
+    raw_public_key = public_key.public_bytes(
+        encoding=serialization.Encoding.Raw,
+        format=serialization.PublicFormat.Raw,
+    )
+
+    manifest = {
+        "aura_version": LOCAL_AURA_VERSION,
+        "aura_id": LOCAL_AURA_ID,
+        "issuer_id": LOCAL_ISSUER_ID,
+        "issuer_name": LOCAL_ISSUER_NAME,
+        "asset_type": "audio_file",
+        "asset_title": asset.name,
+        "asset_filename": asset.name,
+        "asset_hash_algorithm": "SHA-256",
+        "asset_hash": sha256_file_hex(asset),
+        "issued_at": now_utc_iso(),
+        "rights_reservation": {
+            "tdm_opt_out": True,
+            "ai_training_permission": "not_authorized_without_prior_license",
+            "machine_readable_notice": True,
+        },
+        "proof_scope": {
+            "proves": [
+                "existence_at_time",
+                "file_integrity",
+                "manifest_integrity",
+                "rights_reservation_declaration",
+                "issuer_declaration",
+            ],
+            "does_not_prove": [
+                "legal_ownership",
+                "copyright_validity",
+                "actual_ai_training_use",
+                "liability",
+                "infringement",
+            ],
+        },
+        "legal_note": LOCAL_LEGAL_NOTE,
+        "signature": {
+            "algorithm": "Ed25519",
+            "public_key": base64.b64encode(raw_public_key).decode("ascii"),
+            "signature_value": "",
+        },
+    }
+
+    payload = canonical_json_demo_v0(unsigned_local_manifest(manifest))
+    manifest["signature"]["signature_value"] = base64.b64encode(
+        private_key.sign(payload)
+    ).decode("ascii")
+    return manifest
+
+
+def cmd_create(args):
+    asset = Path(args.asset)
+    out = Path(args.out)
+    if not asset.exists():
+        raise SystemExit(f"Asset not found: {asset}")
+
+    manifest = build_local_manifest(asset)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
+
+    print(f"Created AURA manifest: {out}")
+    print(f"Asset hash: {manifest['asset_hash']}")
+    print(f"Manifest hash: {local_manifest_hash_hex(manifest)}")
+
+
+def verify_local_manifest_signature(manifest: Dict[str, Any]) -> bool:
+    signature = manifest.get("signature") or {}
+    if signature.get("algorithm") != "Ed25519":
+        return False
+
+    try:
+        public_key = Ed25519PublicKey.from_public_bytes(
+            base64.b64decode(signature["public_key"])
+        )
+        signature_value = base64.b64decode(signature["signature_value"])
+        payload = canonical_json_demo_v0(unsigned_local_manifest(manifest))
+        public_key.verify(signature_value, payload)
+        return True
+    except (InvalidSignature, KeyError, ValueError, TypeError):
+        return False
+
+
+def print_local_evidence(
+    manifest: Dict[str, Any],
+    computed_asset_hash: str,
+    signature_ok: bool,
+    verification_result: str,
+) -> None:
+    rights = manifest.get("rights_reservation", {})
+    proof_scope = manifest.get("proof_scope", {})
+
+    print("")
+    print("Evidence:")
+    print(f"aura_id: {manifest.get('aura_id', '')}")
+    print(f"issuer_id: {manifest.get('issuer_id', '')}")
+    print(f"issued_at: {manifest.get('issued_at', '')}")
+    print(f"asset_type: {manifest.get('asset_type', '')}")
+    print(f"asset_hash: {manifest.get('asset_hash', '')}")
+    print(f"computed_asset_hash: {computed_asset_hash}")
+    print(f"manifest_hash: {local_manifest_hash_hex(manifest)}")
+    print(f"signature_status: {'OK' if signature_ok else 'FAILED'}")
+    print(f"timestamp: {manifest.get('issued_at', '')}")
+    print(f"rights_reservation: {json.dumps(rights, sort_keys=True)}")
+    print(f"tdm_opt_out: {str(rights.get('tdm_opt_out', False)).lower()}")
+    print(f"verification_result: {verification_result}")
+    print(f"legal_scope: {json.dumps(proof_scope, sort_keys=True)}")
+
+
+def verify_local_manifest(asset: Path, manifest: Dict[str, Any]) -> None:
+    computed_asset_hash = sha256_file_hex(asset)
+    signature_ok = verify_local_manifest_signature(manifest)
+
+    if not signature_ok:
+        print("AURA manifest is INVALID for this asset.")
+        print("Verification result: INVALID")
+        print("Reason: manifest signature mismatch")
+        print_local_evidence(manifest, computed_asset_hash, signature_ok, "INVALID")
+        raise SystemExit(1)
+
+    if computed_asset_hash != manifest.get("asset_hash"):
+        print("AURA manifest is INVALID for this asset.")
+        print("Verification result: INVALID")
+        print("Reason: file hash mismatch")
+        print_local_evidence(manifest, computed_asset_hash, signature_ok, "INVALID")
+        raise SystemExit(1)
+
+    print("AURA manifest is VALID for this asset.")
+    print("Verification result: VALID")
+    print("Asset hash: OK")
+    print("Manifest signature: OK")
+    print(f"TDM opt-out: {str(manifest['rights_reservation']['tdm_opt_out']).lower()}")
+    print_local_evidence(manifest, computed_asset_hash, signature_ok, "VALID")
+
+
 def cmd_verify(args):
     reg = Path(args.registry)
     asset = Path(args.asset)
@@ -350,6 +511,10 @@ def cmd_verify(args):
         raise SystemExit(f"Manifest not found: {manifest_path}")
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+    if manifest.get("aura_version") == LOCAL_AURA_VERSION:
+        verify_local_manifest(asset, manifest)
+        return
 
     issuer_id = manifest.get("issuer_id")
     if not issuer_id:
@@ -407,6 +572,11 @@ def main():
     is_.add_argument("--contact")
     is_.add_argument("--role")
     is_.set_defaults(func=cmd_issue)
+
+    c = s.add_parser("create", help="Create a local AURA v0.1 proof manifest")
+    c.add_argument("--asset", required=True)
+    c.add_argument("--out", required=True)
+    c.set_defaults(func=cmd_create)
 
     v = s.add_parser("verify", help="Verify an AURA manifest against asset + TPKR")
     v.add_argument("--registry", default=TPKR_REGISTRY_FILE)

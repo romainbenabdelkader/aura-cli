@@ -37,6 +37,112 @@ This repository is non-normative.
 
 ---
 
+## AURA Integrity Proof Demo
+
+This repository also includes a complete local proof demo showing that AURA can produce and verify a minimal technical artefact for origin declaration, file integrity, timestamping, rights reservation and manifest integrity.
+
+The demo is intentionally readable for a non-technical audience:
+
+- original file + original manifest = VALID
+- identical copy of the file = VALID
+- actually altered file = INVALID
+- manifest altered after signature = INVALID
+
+AURA provides a verifiable technical artefact. It does not decide legal ownership, infringement or liability. Law, audit, regulator or court decide.
+
+### Create a local AURA manifest
+
+```bash
+python aura_cli.py create --asset assets/track.wav --out assets/track.aura.json
+```
+
+If your system exposes Python 3 as `python3`, use:
+
+```bash
+python3 aura_cli.py create --asset assets/track.wav --out assets/track.aura.json
+```
+
+The generated JSON manifest follows the local AURA v0.1 proof profile and includes:
+
+- `aura_id`
+- `issuer_id`
+- `issued_at`
+- `asset_type`
+- `asset_hash`
+- `rights_reservation`
+- `tdm_opt_out`
+- `proof_scope`
+- `legal_note`
+- `signature`
+
+### Verify a local AURA manifest
+
+```bash
+python aura_cli.py verify --asset assets/track.wav --manifest assets/track.aura.json
+```
+
+Expected valid output:
+
+```text
+AURA manifest is VALID for this asset.
+Verification result: VALID
+Asset hash: OK
+Manifest signature: OK
+TDM opt-out: true
+```
+
+If the file bytes are modified, verification returns:
+
+```text
+AURA manifest is INVALID for this asset.
+Verification result: INVALID
+Reason: file hash mismatch
+```
+
+If the manifest is modified after signature, verification returns:
+
+```text
+AURA manifest is INVALID for this asset.
+Verification result: INVALID
+Reason: manifest signature mismatch
+```
+
+The verification output displays the probative elements:
+
+- `aura_id`
+- `issuer_id`
+- `issued_at`
+- `asset_type`
+- `asset_hash`
+- `manifest_hash`
+- `signature_status`
+- `timestamp`
+- `rights_reservation`
+- `tdm_opt_out`
+- `verification_result`
+- `legal_scope`
+
+### Run the full demo
+
+```bash
+./demo_integrity.sh
+```
+
+The script automatically runs:
+
+1. generation of the original manifest
+2. verification of the original file
+3. creation of an identical copy
+4. verification of the identical copy
+5. real modification of a copied file
+6. verification of the modified file
+7. modification of the manifest after signature
+8. verification of the modified manifest
+
+This demo does not present AURA as surveillance, automatic sanction, automated enforcement or absolute legal proof. It only demonstrates a verifiable technical artefact.
+
+---
+
 ## Why this demonstrator exists
 
 Current debates on AI, copyright, provenance and digital regulation often rely on:
