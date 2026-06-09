@@ -86,6 +86,15 @@ def sha256_file_hex(path: Path) -> str:
     return h.hexdigest()
 
 
+def sha3_256_file_hex(path: Path) -> str:
+    """SHA3-256 hex digest of a file. AURA mandates SHA3-256 for the asset hash."""
+    h = hashlib.sha3_256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def unsigned_local_manifest(manifest: Dict[str, Any]) -> Dict[str, Any]:
     unsigned = copy.deepcopy(manifest)
     unsigned.pop("signature", None)
@@ -320,7 +329,7 @@ def cmd_issue(args):
         "issuer_role": args.role,
     })
 
-    asset_hash = "sha256:" + sha256_file_hex(asset)
+    asset_hash = "sha3-256:" + sha3_256_file_hex(asset)
 
     manifest = {
         "@context": "https://aura-standard.org/context/v1.jsonld",
@@ -377,8 +386,8 @@ def build_local_manifest(asset: Path) -> Dict[str, Any]:
         "asset_type": "audio_file",
         "asset_title": asset.name,
         "asset_filename": asset.name,
-        "asset_hash_algorithm": "SHA-256",
-        "asset_hash": sha256_file_hex(asset),
+        "asset_hash_algorithm": "SHA3-256",
+        "asset_hash": sha3_256_file_hex(asset),
         "issued_at": now_utc_iso(),
         "rights_reservation": {
             "tdm_opt_out": True,
@@ -475,7 +484,7 @@ def print_local_evidence(
 
 
 def verify_local_manifest(asset: Path, manifest: Dict[str, Any]) -> None:
-    computed_asset_hash = sha256_file_hex(asset)
+    computed_asset_hash = sha3_256_file_hex(asset)
     signature_ok = verify_local_manifest_signature(manifest)
 
     if not signature_ok:
@@ -528,7 +537,7 @@ def cmd_verify(args):
     unsigned = dict(manifest)
     unsigned.pop("signature", None)
 
-    if unsigned["asset"]["hash"] != "sha256:" + sha256_file_hex(asset):
+    if unsigned["asset"]["hash"] != "sha3-256:" + sha3_256_file_hex(asset):
         raise SystemExit("Asset hash mismatch.")
 
     payload = canonical_json_demo_v0(unsigned)

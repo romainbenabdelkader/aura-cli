@@ -1,22 +1,39 @@
 {
-  "@context": "https://aura-standard.org/context/v1.jsonld",
-  "origin_proof_version": "0.1",
+  "aura_version": "0.1",
   "aura_id": "AURA-LOCAL-2026-000001-TEST",
-  "origin": {
-    "type": "human",
-    "declared_by": "issuer"
-  },
-  "asset": {
-    "type": "audio",
-    "hash": "sha3-256:d91b81a6cf3f35bfbc5eea4dff4700f0228ac0ded3df4e0d86129de243a36788"
-  },
   "issuer_id": "LOCAL-ISSUER",
-  "issued_at": "2026-01-16T23:45:27.436364Z",
-  "rights": {
-    "tdm_opt_out": true
+  "issuer_name": "Romain Benabdelkader",
+  "asset_type": "audio_file",
+  "asset_title": "example.wav",
+  "asset_filename": "example.wav",
+  "asset_hash_algorithm": "SHA3-256",
+  "asset_hash": "d91b81a6cf3f35bfbc5eea4dff4700f0228ac0ded3df4e0d86129de243a36788",
+  "issued_at": "2026-06-09T10:05:06.102051Z",
+  "rights_reservation": {
+    "tdm_opt_out": true,
+    "ai_training_permission": "not_authorized_without_prior_license",
+    "machine_readable_notice": true
   },
+  "proof_scope": {
+    "proves": [
+      "existence_at_time",
+      "file_integrity",
+      "manifest_integrity",
+      "rights_reservation_declaration",
+      "issuer_declaration"
+    ],
+    "does_not_prove": [
+      "legal_ownership",
+      "copyright_validity",
+      "actual_ai_training_use",
+      "liability",
+      "infringement"
+    ]
+  },
+  "legal_note": "This manifest provides a verifiable technical proof of declaration, integrity and timestamp. It does not replace legal qualification by a court, regulator or competent authority.",
   "signature": {
-    "alg": "ed25519",
-    "value": "NGl+q35FSUuJiZiWwk5n2S0gaM81WEI5/iHY7JNLpvPmKiN+0cywo+u6jtRQq0w8HIdFfWL/otKpzNwPRy54Bg=="
+    "algorithm": "Ed25519",
+    "public_key": "LDs4Yq/P9/z+PX/jjOlrcKibMcyNnu0cDJNGOsT5CVY=",
+    "signature_value": "Xg416V3CT1ZrL49wBV2ich2yZoKkLQD1mUjoiTua0oWhgoqRMIeQY4QedJkbm1xxf6m2kl3moMgj/pVDzVS1Dw=="
   }
 }
