@@ -1,12 +1,12 @@
 # AURA CLI
 
-Minimal reference demonstrator for verifiable origin, integrity and consent signals.
+Minimal educational demonstrator for verifiable origin, integrity and consent signals.
 
 AURA CLI shows how a digital asset can be bound to a cryptographically verifiable manifest, without DRM, watermarking, monitoring, platform control or automated enforcement.
 
 > AURA establishes technical facts. It does not enforce rights.
 
-This repository is a non-normative reference testbed for the AURA model.
+This repository is a non-normative educational prototype for the AURA model. It is not production-ready, does not define the protected implementation layer, and must not be treated as the official operational infrastructure of AURA.
 
 ## Demo Video
 
@@ -24,7 +24,7 @@ AURA is structured as three distinct layers:
   https://github.com/romainbenabdelkader/AURA-STANDARD
 - **aura-core**: reusable implementation primitives
   https://github.com/romainbenabdelkader/aura-core
-- **aura-cli**: minimal command-line demonstrator
+- **aura-cli**: minimal non-normative command-line demonstrator
   this repository
 
 ## AURA Integrity Proof Demo
@@ -198,7 +198,7 @@ This repository demonstrates, in the simplest possible form:
 
 ## What This Demonstrator Does Not Do
 
-This is a reference demonstrator only.
+This is a non-normative educational demonstrator only.
 
 It does not implement:
 
@@ -266,7 +266,7 @@ No personal data is required.
 
 AURA CLI is:
 
-- a technical reference
+- an educational prototype
 - a testbed artefact
 - a discussion support tool for regulators, institutions and engineers
 
