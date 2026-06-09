@@ -332,7 +332,7 @@ def cmd_issue(args):
     asset_hash = "sha3-256:" + sha3_256_file_hex(asset)
 
     manifest = {
-        "@context": "https://aura-standard.org/context/v1.jsonld",
+        "@context": "https://www.aura-standard.org/context/v1.jsonld",
         "spec_version": "0.2-draft",
         "canonicalization": "demo_profile_v0 (RFC8785 planned)",
         "verification_model": "TPKR registry (governed); anchoring planned",
