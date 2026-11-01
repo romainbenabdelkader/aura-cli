@@ -1,5 +1,12 @@
 # AURA CLI
 
+> Historical v0.1 educational demonstration. The local demo format and Python
+> deterministic JSON serialization are not the current AURA v1.0/v1.1 JCS
+> workflow. For current integration, start with
+> [AURA-VERIFIER's guide](https://github.com/romainbenabdelkader/AURA-VERIFIER/blob/main/INTEGRATORS.md)
+> and its public test vector. Do not relabel existing demo proofs as current
+> manifests; this repository is not the current signing SDK.
+
 Minimal educational demonstrator for verifiable origin, integrity and consent signals.
 
 AURA CLI shows how a digital asset can be bound to a cryptographically verifiable manifest, without DRM, watermarking, monitoring, platform control or automated enforcement.
