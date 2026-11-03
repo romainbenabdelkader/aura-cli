@@ -36,7 +36,11 @@ AURA is structured as three distinct layers:
 
 ## AURA Integrity Proof Demo
 
-This repository includes a complete local proof demo showing that AURA can produce and verify a minimal technical artefact for origin declaration, file integrity, timestamping, rights reservation and manifest integrity.
+This repository includes a local v0.1 proof demo for origin declarations, file integrity, declared issuance time, rights reservation and manifest integrity.
+
+The demo does not obtain or verify an independent timestamp. Its historical
+`existence_at_time` label and displayed `timestamp` are not evidence that a
+trusted third party observed the file at that time.
 
 The demo is intentionally readable for a non-technical audience:
 
@@ -135,6 +139,16 @@ The script automatically runs:
 6. verification of the modified file
 7. modification of the manifest after signature
 8. verification of the modified manifest
+
+Each step checks its exit status and expected result. An unexpected outcome
+stops the script with a nonzero exit status; the summary is printed only after
+all checks succeed.
+
+Regression checks for the demo script:
+
+```bash
+python3 -m unittest discover -s tests -v
+```
 
 This demo does not present AURA as surveillance, automatic sanction, automated enforcement or absolute legal proof. It only demonstrates a verifiable technical artefact.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -u
+set -eu
 
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
@@ -12,28 +12,38 @@ ALTERED_MANIFEST="$ASSETS_DIR/track.tampered.aura.json"
 
 run_step() {
   local title="$1"
-  shift
+  local expected_status="$2"
+  local expected_message="$3"
+  local output status
+  shift 3
   printf "\n============================================================\n"
   printf "%s\n" "$title"
   printf "============================================================\n"
-  "$@"
-  local status=$?
-  if [ "$status" -ne 0 ]; then
-    printf "(expected failure shown above)\n"
+  if output=$("$@" 2>&1); then
+    status=0
+  else
+    status=$?
   fi
-  return 0
+  printf '%s\n' "$output"
+  if [ "$status" -ne "$expected_status" ] || [[ "$output" != *"$expected_message"* ]]; then
+    printf 'Demo stopped: unexpected result (exit %s; expected %s and "%s").\n' \
+      "$status" "$expected_status" "$expected_message" >&2
+    exit 1
+  fi
 }
 
 mkdir -p "$ASSETS_DIR"
 
 run_step \
   "1. Generate original AURA manifest" \
+  0 "Created AURA manifest:" \
   "$PYTHON_BIN" "$ROOT_DIR/aura_cli.py" create \
     --asset "$ORIGINAL_ASSET" \
     --out "$ORIGINAL_MANIFEST"
 
 run_step \
   "2. Original file + original manifest = VALID" \
+  0 "Verification result: VALID" \
   "$PYTHON_BIN" "$ROOT_DIR/aura_cli.py" verify \
     --asset "$ORIGINAL_ASSET" \
     --manifest "$ORIGINAL_MANIFEST"
@@ -41,6 +51,7 @@ run_step \
 cp "$ORIGINAL_ASSET" "$COPY_ASSET"
 run_step \
   "3. Identical copy + original manifest = VALID" \
+  0 "Verification result: VALID" \
   "$PYTHON_BIN" "$ROOT_DIR/aura_cli.py" verify \
     --asset "$COPY_ASSET" \
     --manifest "$ORIGINAL_MANIFEST"
@@ -49,6 +60,7 @@ cp "$ORIGINAL_ASSET" "$ALTERED_ASSET"
 printf "\nThis line changes the file bytes.\n" >> "$ALTERED_ASSET"
 run_step \
   "4. Actually modified file + original manifest = INVALID" \
+  1 "Reason: file hash mismatch" \
   "$PYTHON_BIN" "$ROOT_DIR/aura_cli.py" verify \
     --asset "$ALTERED_ASSET" \
     --manifest "$ORIGINAL_MANIFEST"
@@ -70,11 +82,12 @@ PY
 
 run_step \
   "5. Manifest modified after signature = INVALID" \
+  1 "Reason: manifest signature mismatch" \
   "$PYTHON_BIN" "$ROOT_DIR/aura_cli.py" verify \
     --asset "$ORIGINAL_ASSET" \
     --manifest "$ALTERED_MANIFEST"
 
-printf "\nDemo summary:\n"
+printf "\nDemo summary (all expected results checked):\n"
 printf "%s\n" "- original = VALID"
 printf "%s\n" "- identical copy = VALID"
 printf "%s\n" "- altered file = INVALID"
